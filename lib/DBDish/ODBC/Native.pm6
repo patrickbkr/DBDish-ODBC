@@ -236,24 +236,21 @@ class SQL_HANDLE is repr('CPointer') {
 	if $code +& SQL_SUCCESS_MASK {
 	    my ODBCErr $rep;
 	    if self { # On allocated handle
-		my $ret = SQL_SUCCESS;
-		my utf8 $state .= allocate(5);
-		my int32 $native;
-		my utf8 $message .= allocate(256);
-		my int32 $etl;
-		my $i = 0;
-		$ret = SQLGetDiagRec(
-		    self.h-type, self, ++$i, $state, $native,
-		    $message, $message.elems, $etl
-		);
-		X::DBDish::ODBCNatErr.new(
-		    :$state, :$native, :native-message($message),
-		    :handle(self.^name)
-		).fail if $throw;
-		$rep .= new(
-		    :list(~$state, ~$message.subbuf(^$etl)),
-		    :hash(%(:$code))
-		);
+            my $ret = SQL_SUCCESS;
+            my utf8 $state .= allocate(5);
+            my int32 $native;
+            my utf8 $message .= allocate(256);
+            my int32 $etl;
+            my $i = 0;
+            $ret = SQLGetDiagRec(
+                self.h-type, self, ++$i, $state, $native,
+                $message, $message.elems, $etl
+            );
+            X::DBDish::ODBCNatErr.new(
+                :$state, :$native, :native-message($message),
+                :handle(self.^name)
+            ).fail if $throw;
+            $rep .= new(:list($code, "$state {$message.subbuf(^$etl)}"));
 	    }
 	    else { fail "Can't allocate the ENV Handle" }
 	    $rep;
