@@ -37,7 +37,7 @@ ok my $dbh = $drv.connect(
     :Driver($DRV), :database<dbdishtest>, |(%TestOpts{$DRV}||())
 ),								    "Connected to $DRV";
 
-isa-ok $dbh, ::('DBDish::ODBC::Connection');
+is $dbh.^name, 'DBDish::ODBC::Connection';
 
 ok $dbh.fconn-str,				     'Full connection string available';
 #dd $dbh.fconn-str;
@@ -47,7 +47,7 @@ is @res, ['Hola a todos', 5],				             'The right values';
 
 ok (my $sth = $dbh.prepare(q|SELECT 'Hola mundo' as Hello|)),   'Can prepare statement';
 
-isa-ok $sth, ::('DBDish::ODBC::StatementHandle');
+is $sth.^name, 'DBDish::ODBC::StatementHandle';
 
 is $dbh.Statements.elems, 1,				                'One statement';
 
