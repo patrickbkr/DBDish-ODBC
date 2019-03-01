@@ -11,7 +11,7 @@ has Str $.fconn-str;
 submethod BUILD(:$!conn!, :$!fconn-str!, :$!parent!, :$!RaiseError) { };
 
 method !handle-error($rep) {
-    $rep ~~ ODBCErr ?? self!set-err(|$rep) !! $rep
+    $rep ~~ ODBCErr ?? self!set-err(|$rep.list) !! $rep
 }
 
 method prepare(Str $statement, *%args) {

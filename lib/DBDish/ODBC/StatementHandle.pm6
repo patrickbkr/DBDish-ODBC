@@ -12,7 +12,7 @@ has @!param-type;
 has $!field_count;
 
 method !handle-error($rep) {
-    $rep ~~ ODBCErr ?? self!set-err(|$rep) !! $rep
+    $rep ~~ ODBCErr ?? self!set-err(|$rep.list) !! $rep
 }
 
 method !get-meta {

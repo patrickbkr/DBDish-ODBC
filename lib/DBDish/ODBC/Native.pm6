@@ -250,7 +250,10 @@ class SQL_HANDLE is repr('CPointer') {
                 :$state, :$native, :native-message($message),
                 :handle(self.^name)
             ).fail if $throw;
-            $rep .= new(:list($code, "$state {$message.subbuf(^$etl)}"));
+            $rep .= new(
+               :list($code, "$state {$message.subbuf(^$etl)}"),
+               :hash(%(:$code))
+           );
 	    }
 	    else { fail "Can't allocate the ENV Handle" }
 	    $rep;
