@@ -259,7 +259,7 @@ class SQL_HANDLE is repr('CPointer') {
 		    :handle(self.^name)
 		).fail if $throw;
 		$rep .= new(
-		    :list(~$state, ~$message.subbuf(^$etl)),
+		    :list($code, "$state, {$message.subbuf(^$etl)}"),
 		    :hash(%(:$code))
 		);
 	    }
