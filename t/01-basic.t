@@ -17,7 +17,7 @@ lives-ok {
 throws-like {
     $drv.connect('NoSush');
 }, X::DBDish::ConnectionFailed,
-   :code<IM002>, # The ODBC error code expected
+   :code<-1>, # The ODBC error code expected
    :message(/ '[Driver Manager]' /), # The level of the error
    'Bogus connect';
 
