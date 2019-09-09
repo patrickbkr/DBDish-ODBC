@@ -92,7 +92,7 @@ constant %SQLType-Conv is export = map({
     +SQLTypes::{.key} => .value;
 }, (
     :SQL_GUID(          Str),
-    :SQL_WLONGVARCHAR(  Buf),
+    :SQL_WLONGVARCHAR(  Str),
     :SQL_WVARCHAR(      Str),
     :SQL_WCHAR(         Str),
     :SQL_BIT(          Bool),
@@ -101,7 +101,7 @@ constant %SQLType-Conv is export = map({
     :SQL_LONGVARBINARY( Buf),
     :SQL_VARBINARY(     Buf),
     :SQL_BINARY(        Buf),
-    :SQL_LONGVARCHAR(   Buf),
+    :SQL_LONGVARCHAR(   Str),
     :SQL_UNKNOWN_TYPE(  Any),
     :SQL_CHAR(          Str),
     :SQL_NUMERIC(       Rat),
