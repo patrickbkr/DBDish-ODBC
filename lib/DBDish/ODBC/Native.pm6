@@ -292,7 +292,7 @@ class SQLENV is SQL_HANDLE is export is repr('CPointer') {
 	    SQLDrivers(self, $dir, $drv_desc,  255, my int16 $etl1,
 				   $drv_attr, 1024, my int16 $etl2)
 	) || do {
-	    (~$drv_desc.subbuf(^$etl1), ~$drv_attr.subbuf(^$etl2))
+	    ($drv_desc.subbuf(^$etl1).decode, $drv_attr.subbuf(^$etl2).decode)
 	};
     }
 
@@ -306,7 +306,7 @@ class SQLENV is SQL_HANDLE is export is repr('CPointer') {
 	    SQLDataSources(self, $dir, $drv_desc,  255, my int16 $etl1,
 				       $drv_attr, 1024, my int16 $etl2)
 	) || do {
-	    (~$drv_desc.subbuf(^$etl1), ~$drv_attr.subbuf(^$etl2))
+	    ($drv_desc.subbuf(^$etl1).decode, $drv_attr.subbuf(^$etl2).decode)
 	};
     }
 
@@ -423,7 +423,7 @@ class SQLSTMT is SQL_HANDLE is export is repr('CPointer') {
 		warn "ODBC: No typemap defined for type $datatype in column $col";
 		$type = Str;
 	    }
-	    Map.new: ( :name(~$name.subbuf(^$etl)),
+	    Map.new: ( :name($name.subbuf(^$etl).decode),
 		       :$datatype, :$type, :$colsize, :$dd, :$nullable );
 	}
     }
