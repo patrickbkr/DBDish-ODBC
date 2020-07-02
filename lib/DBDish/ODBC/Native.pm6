@@ -47,6 +47,7 @@ constant SQL_FETCH_FIRST_SYSTEM is export = 32;
 
 constant SQL_NULL_DATA is export = -1;
 constant SQL_NTS       is export = -3;
+constant SQL_NO_TOTAL  is export = -4;
 
 # Params type
 constant SQL_PARAM_TYPE_UNKNOWN        =  0;
@@ -433,18 +434,39 @@ class SQLSTMT is SQL_HANDLE is export is repr('CPointer') {
 	sub SQLGetData(SQLSTMT:D, uint16, uint16, Buf, int64, int64 is rw --> int16)
 	    is native(LIB) { * }
     method GetData(Int $col, :$raw) {
-	my Buf $data .= allocate(4096);
+	my $write-buf-size = 4096;
+	my Buf $write-buf .= allocate($write-buf-size);
+	my $data-size = $write-buf-size;
+	my Buf $data .= allocate($data-size);
 	my int64 $etl;
-	self.handle-res(
+	my $res = self.handle-res(
 	    SQLGetData(self, $col,
-		($raw ?? SQL_C_BINARY !! SQL_C_CHAR), $data, 4096, $etl
+		($raw ?? SQL_C_BINARY !! SQL_C_CHAR), $data, $data-size, $etl
 	    )
-	) ||  do {
-	    if $etl >= 0 {
-		$data .= subbuf(^$etl);
-		($raw ?? $data !! $data.decode);
-	    } else { $raw ?? Buf !! Str }
-	}
+    );
+    while $etl == SQL_NO_TOTAL || $etl > $write-buf-size {
+        $res = self.handle-res(
+            SQLGetData(self, $col,
+            ($raw ?? SQL_C_BINARY !! SQL_C_CHAR),
+            $write-buf, $write-buf-size, $etl
+            )
+        );
+        # SQLGetData seems to append a null byte on every partial result.
+        # We will write over that null byte of the previous partial result.
+        $data-size += $write-buf-size - 1;
+        $data.reallocate($data-size);
+        $data.subbuf-rw($data-size - $write-buf-size, $write-buf-size) = $write-buf;
+    }
+
+    if !$res {
+        do {
+            if $etl >= 0 {
+                $etl = $data-size - $write-buf-size + $etl;
+                $data .= subbuf(^$etl);
+                ($raw ?? $data !! $data.decode);
+            } else { $raw ?? Buf !! Str }
+        }
+    }
     }
 
 	sub SQLRowCount(SQLSTMT:D, int64 is rw --> int16) is native(LIB) { * }
